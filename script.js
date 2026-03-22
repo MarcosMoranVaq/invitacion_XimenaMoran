@@ -15,65 +15,18 @@ const CONFIG = {
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
     
+    // Inicializar AOS con animaciones más fluidas
     AOS.init({
-        duration: 800,
-        once: true,
-        offset: 40,
-        easing: 'ease-out-quad'
+        duration: 1000,
+        once: false,
+        offset: 80,
+        easing: 'ease-out-quad',
+        mirror: true
     });
     
     const reminderBtn = document.getElementById('reminderBtn');
     const confirmMessage = document.getElementById('confirmMessage');
     const mapButtons = document.querySelectorAll('.map-btn');
-    
-    // Función para subir imágenes
-    function setupImageUpload(photoContainer, imgElement, storageKey) {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.style.display = 'none';
-        document.body.appendChild(fileInput);
-        
-        const savedImage = localStorage.getItem(storageKey);
-        if (savedImage) {
-            imgElement.src = savedImage;
-        }
-        
-        photoContainer.addEventListener('click', function(e) {
-            e.stopPropagation();
-            fileInput.click();
-        });
-        
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const imageUrl = event.target.result;
-                    imgElement.src = imageUrl;
-                    localStorage.setItem(storageKey, imageUrl);
-                    showConfirmation("¡Foto actualizada!");
-                };
-                reader.readAsDataURL(file);
-            } else if (file) {
-                alert("Por favor, selecciona una imagen válida.");
-            }
-        });
-    }
-    
-    // Configurar fotos
-    const godparentsPhoto = document.getElementById('godparentsPhoto');
-    const godparentsImg = document.getElementById('godparentsImg');
-    const familyPhoto = document.getElementById('familyPhoto');
-    const familyImg = document.getElementById('familyImg');
-    
-    if (godparentsPhoto && godparentsImg) {
-        setupImageUpload(godparentsPhoto, godparentsImg, 'godparents_photo');
-    }
-    
-    if (familyPhoto && familyImg) {
-        setupImageUpload(familyPhoto, familyImg, 'family_photo');
-    }
     
     function showConfirmation(text = "¡Recordatorio agregado a tu calendario!") {
         const msgSpan = confirmMessage.querySelector('span');
@@ -146,9 +99,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const card = document.querySelector('.invitation-card');
     if (card) {
         card.style.opacity = '0';
-        card.style.transform = 'translateY(25px)';
+        card.style.transform = 'translateY(30px)';
         setTimeout(() => {
-            card.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+            card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
         }, 100);
@@ -166,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Partículas
+    // Partículas dinámicas
     function adjustParticles() {
         const particles = document.querySelectorAll('.particle');
         particles.forEach(particle => {
@@ -182,4 +135,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     adjustParticles();
+    
+    // Scroll reveal adicional
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.section-title, .godparents-section, .family-section, .event-info, .action-buttons').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
 });

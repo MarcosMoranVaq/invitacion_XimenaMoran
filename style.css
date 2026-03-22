@@ -16,7 +16,8 @@
     --bg-light: #fffbf8;
     --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 25px 50px rgba(0, 0, 0, 0.15);
-    --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    --transition: all 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 body {
@@ -31,7 +32,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ===== PARTÍCULAS ANIMADAS ===== */
+/* ===== PARTÍCULAS ANIMADAS MEJORADAS ===== */
 .particles-container {
     position: fixed;
     top: 0;
@@ -45,10 +46,11 @@ body {
 
 .particle {
     position: absolute;
-    background: radial-gradient(circle, rgba(245, 218, 209, 0.5) 0%, rgba(243, 207, 181, 0) 80%);
+    background: radial-gradient(circle, rgba(245, 218, 209, 0.6) 0%, rgba(243, 207, 181, 0) 80%);
     border-radius: 50%;
     pointer-events: none;
     animation: floatParticle linear infinite;
+    filter: blur(3px);
 }
 
 @keyframes floatParticle {
@@ -56,11 +58,14 @@ body {
         transform: translateY(100vh) translateX(-30%) rotate(0deg);
         opacity: 0;
     }
-    15% {
-        opacity: 0.5;
+    10% {
+        opacity: 0.6;
     }
-    85% {
-        opacity: 0.5;
+    50% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.4;
     }
     100% {
         transform: translateY(-20vh) translateX(30%) rotate(360deg);
@@ -156,7 +161,7 @@ body {
 
 @keyframes gentleFloat {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+    50% { transform: translateY(-8px); }
 }
 
 .chalice-symbol svg {
@@ -166,6 +171,8 @@ body {
 
 .chalice-container:hover svg {
     filter: drop-shadow(0 8px 18px rgba(210, 160, 120, 0.3));
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
 }
 
 /* Texto principal */
@@ -208,6 +215,7 @@ body {
     height: 2px;
     background: linear-gradient(90deg, transparent, var(--pastel-peach), var(--gold-soft), transparent);
     margin: 1.2rem auto;
+    transform-origin: center;
 }
 
 .description {
@@ -230,7 +238,7 @@ body {
 
 .verse-container:hover {
     background: rgba(243, 207, 181, 0.25);
-    transform: translateX(5px);
+    transform: translateX(8px);
 }
 
 .verse-container i {
@@ -270,6 +278,11 @@ body {
     color: var(--gold-warm);
     display: block;
     margin-bottom: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.section-title:hover i {
+    transform: scale(1.1);
 }
 
 .section-title span {
@@ -300,12 +313,12 @@ body {
     border-radius: 1.8rem;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
-    transition: var(--transition);
+    transition: var(--transition-bounce);
     border: 1px solid rgba(232, 197, 168, 0.3);
 }
 
 .godparents-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-lg);
     background: rgba(255, 248, 242, 0.95);
 }
@@ -313,49 +326,20 @@ body {
 .godparents-photo {
     position: relative;
     width: 100%;
-    height: 220px;
+    height: 260px;
     overflow: hidden;
     background: linear-gradient(135deg, #f3e0d4, #f9ede5);
-    cursor: pointer;
 }
 
 .godparents-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.godparents-photo:hover img {
-    transform: scale(1.05);
-}
-
-.photo-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-    color: white;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    font-size: 0.85rem;
-    font-family: 'Montserrat', sans-serif;
-    cursor: pointer;
-}
-
-.godparents-photo:hover .photo-overlay,
-.family-photo:hover .photo-overlay {
-    opacity: 1;
-}
-
-.photo-overlay i {
-    font-size: 1rem;
+.godparents-card:hover .godparents-photo img {
+    transform: scale(1.08);
 }
 
 .godparents-info {
@@ -397,6 +381,12 @@ body {
     font-size: 0.75rem;
     color: var(--gold-warm);
     font-family: 'Montserrat', sans-serif;
+    transition: var(--transition);
+}
+
+.godparents-badge:hover {
+    background: rgba(232, 197, 168, 0.4);
+    transform: scale(1.05);
 }
 
 .godparents-badge i {
@@ -413,33 +403,32 @@ body {
     border-radius: 1.8rem;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
-    transition: var(--transition);
+    transition: var(--transition-bounce);
     border: 1px solid rgba(232, 197, 168, 0.3);
 }
 
 .family-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-lg);
 }
 
 .family-photo {
     position: relative;
     width: 100%;
-    height: 280px;
+    height: 320px;
     overflow: hidden;
     background: linear-gradient(135deg, #f3e0d4, #f9ede5);
-    cursor: pointer;
 }
 
 .family-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.family-photo:hover img {
-    transform: scale(1.03);
+.family-card:hover .family-photo img {
+    transform: scale(1.08);
 }
 
 .family-info {
@@ -485,11 +474,11 @@ body {
 
 .info-item:hover {
     background: var(--pastel-pink);
-    transform: translateX(5px);
+    transform: translateX(10px);
 }
 
 .location-item:hover {
-    background: rgba(243, 207, 181, 0.25);
+    background: rgba(243, 207, 181, 0.35);
 }
 
 .info-icon {
@@ -505,6 +494,12 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     flex-shrink: 0;
     border: 1px solid rgba(232, 197, 168, 0.3);
+    transition: var(--transition);
+}
+
+.info-item:hover .info-icon {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .info-details {
@@ -557,6 +552,7 @@ body {
 
 .map-btn i {
     font-size: 0.75rem;
+    transition: transform 0.3s ease;
 }
 
 .map-btn:hover {
@@ -564,6 +560,10 @@ body {
     color: white;
     border-color: var(--gold-soft);
     transform: translateY(-2px);
+}
+
+.map-btn:hover i {
+    transform: translateX(3px);
 }
 
 /* ===== BOTÓN PRINCIPAL ===== */
@@ -586,7 +586,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.8rem;
-    transition: var(--transition);
+    transition: var(--transition-bounce);
     letter-spacing: 0.8px;
 }
 
@@ -598,13 +598,22 @@ body {
 }
 
 .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 14px 28px rgba(232, 197, 168, 0.5);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 16px 32px rgba(232, 197, 168, 0.5);
     background: linear-gradient(135deg, #f3bfa8 0%, #e8bf92 100%);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .btn-primary i {
     font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-primary:hover i {
+    transform: rotate(15deg);
 }
 
 /* ===== MENSAJE CONFIRMACIÓN ===== */
@@ -617,7 +626,7 @@ body {
     align-items: center;
     gap: 0.75rem;
     margin: 0.8rem 0;
-    animation: slideIn 0.4s ease;
+    animation: slideInUp 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .confirm-message.show {
@@ -627,6 +636,7 @@ body {
 .confirm-message i {
     color: var(--gold-warm);
     font-size: 1.2rem;
+    animation: bounce 0.6s ease;
 }
 
 .confirm-message span {
@@ -635,15 +645,20 @@ body {
     color: #6a5a48;
 }
 
-@keyframes slideIn {
+@keyframes slideInUp {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
 
 /* ===== FOOTER ===== */
@@ -665,6 +680,11 @@ body {
     color: var(--gold-warm);
     font-style: italic;
     margin-bottom: 0.3rem;
+    transition: var(--transition);
+}
+
+.footer-text:hover {
+    transform: scale(1.05);
 }
 
 .footer-family {
@@ -672,6 +692,18 @@ body {
     font-size: 0.75rem;
     color: #b8a48c;
     letter-spacing: 1px;
+}
+
+/* ===== ANIMACIONES DE SCROLL ADICIONALES ===== */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* ===== RESPONSIVE ===== */
@@ -712,11 +744,11 @@ body {
     }
     
     .godparents-photo {
-        height: 180px;
+        height: 200px;
     }
     
     .family-photo {
-        height: 220px;
+        height: 240px;
     }
     
     .godparents-names {
@@ -758,11 +790,11 @@ body {
     }
     
     .godparents-photo {
-        height: 160px;
+        height: 180px;
     }
     
     .family-photo {
-        height: 200px;
+        height: 220px;
     }
     
     .godparents-info {
@@ -771,9 +803,5 @@ body {
     
     .family-info {
         padding: 1rem;
-    }
-    
-    .photo-overlay span {
-        font-size: 0.7rem;
     }
 }
