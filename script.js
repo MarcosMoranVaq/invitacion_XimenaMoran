@@ -61,6 +61,29 @@ function sendWhatsAppNotification(name, count, message) {
     window.open(url, '_blank');
 }
 
+// ===== FUNCIÓN PARA CENTRAR MODAL EN LA PANTALLA VISIBLE =====
+function centerModalOnScreen() {
+    const modal = document.getElementById('rsvpModal');
+    if (modal && modal.classList.contains('show')) {
+        // Forzar el scroll al top del modal para que aparezca centrado en pantalla
+        window.scrollTo({
+            top: 0,
+            behavior: 'instant'
+        });
+        
+        // También podemos asegurar que el modal se vea correctamente
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${window.scrollY}px`;
+        document.body.style.width = '100%';
+        
+        // Guardar la posición actual para restaurar después
+        const scrollY = window.scrollY;
+        
+        // Restaurar después de cerrar
+        modal.setAttribute('data-scroll-position', scrollY);
+    }
+}
+
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -83,14 +106,42 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (openModalBtn) {
         openModalBtn.addEventListener('click', function() {
+            // Guardar posición actual de scroll
+            const scrollY = window.scrollY;
+            modal.setAttribute('data-scroll-position', scrollY);
+            
+            // Mostrar modal
             modal.classList.add('show');
+            
+            // Bloquear scroll del body y fijar posición
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
             document.body.style.overflow = 'hidden';
+            
+            // Asegurar que el modal se vea desde cualquier posición
+            // El modal ya está centrado con CSS, pero forzamos que la pantalla esté en top 0
         });
     }
     
     function closeModal() {
+        // Obtener la posición guardada
+        const scrollY = parseInt(modal.getAttribute('data-scroll-position') || '0');
+        
         modal.classList.remove('show');
+        
+        // Restaurar scroll del body
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
         document.body.style.overflow = '';
+        
+        // Volver a la posición donde estaba
+        window.scrollTo({
+            top: scrollY,
+            behavior: 'instant'
+        });
+        
         if (rsvpForm) rsvpForm.reset();
         if (modalMessage) {
             modalMessage.className = 'rsvp-status-modal';
@@ -102,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeModalBtn.addEventListener('click', closeModal);
     }
     
+    // Cerrar al hacer clic fuera del modal
     window.addEventListener('click', function(e) {
         if (modal && modal.classList.contains('show')) {
             if (e.target === modal) {
@@ -109,6 +161,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    // Prevenir que el scroll dentro del modal afecte al body
+    if (modal) {
+        modal.addEventListener('touchmove', function(e) {
+            // Permitir scroll dentro del modal, pero no fuera
+            if (e.target === modal) {
+                e.preventDefault();
+            }
+        });
+    }
     
     // ===== FORMULARIO =====
     if (rsvpForm) {
