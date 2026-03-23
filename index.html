@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Previsualización para WhatsApp y redes sociales -->
+    <meta property="og:title" content="Primera Comunión de Ximena Morán Vaquero">
+    <meta property="og:description" content="Te invitamos a celebrar este día tan especial. Sábado 25 de abril - 1:00 pm. Confirma tu asistencia ✨">
+    <meta property="og:image" content="fam_moranO.jpeg">
+    <meta property="og:url" content="https://tu-enlace.netlify.app">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Ximena Morán Vaquero | Primera Comunión</title>
@@ -109,7 +116,7 @@
                 <div class="family-section" data-aos="fade-up" data-aos-delay="400">
                     <div class="family-card">
                         <div class="family-photo">
-                            <img src="fam1.jpeg" alt="Familia Morán Vaquero">
+                            <img src="fam_moranO.jpeg" alt="Familia Morán Vaquero">
                         </div>
                         <div class="family-info">
                             <h3 class="family-name">Familia Morán Vaquero</h3>
@@ -118,48 +125,66 @@
                     </div>
                 </div>
                 
-                <!-- FORMULARIO DE CONFIRMACIÓN -->
-                <div class="section-title" data-aos="fade-up" data-aos-delay="200">
+                <!-- ===== BOTONES PRINCIPALES (juntos al mismo nivel) ===== -->
+                <div class="action-buttons-row" data-aos="zoom-in" data-aos-delay="600">
+                    <button class="btn btn-confirm-main" id="openRsvpModalBtn">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Confirmar asistencia</span>
+                    </button>
+                    <button class="btn btn-primary" id="reminderBtn">
+                        <i class="fas fa-bell"></i>
+                        <span>Agregar recordatorio</span>
+                    </button>
+                </div>
+                
+                <div id="reminderMessage" class="confirm-message">
                     <i class="fas fa-check-circle"></i>
-                    <span>Confirmar asistencia</span>
-                    <div class="title-decoration"></div>
+                    <span>¡Recordatorio agregado a tu calendario!</span>
                 </div>
                 
-                <div class="rsvp-form-container" data-aos="fade-up" data-aos-delay="400">
-                    <form id="rsvpForm">
-                        <div class="form-group">
-                            <label for="guestName">Nombre del invitado o familia *</label>
-                            <input type="text" id="guestName" name="guestName" required placeholder="Ej: Familia García o María López">
+                <!-- ===== MODAL DEL FORMULARIO DE CONFIRMACIÓN ===== -->
+                <div id="rsvpModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-calendar-check"></i> Confirmar asistencia</h3>
+                            <button class="modal-close" id="closeModalBtn">&times;</button>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="guestCount">Número de personas que asistirán *</label>
-                            <select id="guestCount" name="guestCount" required>
-                                <option value="1">1 persona</option>
-                                <option value="2">2 personas</option>
-                                <option value="3">3 personas</option>
-                                <option value="4">4 personas</option>
-                                <option value="5">5 personas</option>
-                                <option value="6">6 personas</option>
-                                <option value="7">7 o más</option>
-                            </select>
+                        <div class="modal-body">
+                            <form id="rsvpForm">
+                                <div class="form-group">
+                                    <label for="guestName">Nombre del invitado o familia *</label>
+                                    <input type="text" id="guestName" name="guestName" required placeholder="Ej: Familia García o María López">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="guestCount">Número de personas que asistirán *</label>
+                                    <select id="guestCount" name="guestCount" required>
+                                        <option value="1">1 persona</option>
+                                        <option value="2">2 personas</option>
+                                        <option value="3">3 personas</option>
+                                        <option value="4">4 personas</option>
+                                        <option value="5">5 personas</option>
+                                        <option value="6">6 personas</option>
+                                        <option value="7">7 o más</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="guestMessage">Mensaje de saludo (opcional)</label>
+                                    <textarea id="guestMessage" name="guestMessage" rows="3" placeholder="Ej: ¡Muchas felicidades Ximena! Nos vemos pronto..."></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn-submit-rsvp">
+                                    <i class="fas fa-paper-plane"></i> Enviar confirmación
+                                </button>
+                            </form>
+                            <div id="rsvpModalMessage" class="rsvp-status-modal"></div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="guestMessage">Mensaje de saludo (opcional)</label>
-                            <textarea id="guestMessage" name="guestMessage" rows="2" placeholder="Ej: ¡Muchas felicidades Ximena! Nos vemos pronto..."></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn-confirm">
-                            <i class="fas fa-paper-plane"></i> Confirmar asistencia
-                        </button>
-                    </form>
-                    
-                    <div id="rsvpMessage" class="rsvp-status"></div>
+                    </div>
                 </div>
                 
-                <!-- BOTÓN ADMIN -->
-                <div class="admin-section" data-aos="fade-up" data-aos-delay="600">
+                <!-- BOTÓN ADMIN (discreto) -->
+                <div class="admin-section" data-aos="fade-up" data-aos-delay="700">
                     <button class="btn-admin" id="adminBtn">
                         <i class="fas fa-chart-simple"></i> Ver confirmaciones
                     </button>
@@ -197,7 +222,7 @@
                             <div class="info-icon"><i class="fas fa-clock"></i></div>
                             <div class="info-details">
                                 <span class="info-label">Hora</span>
-                                <span class="info-value">14:00 horas</span>
+                                <span class="info-value">13:00 horas</span>
                             </div>
                         </div>
                         
@@ -206,7 +231,7 @@
                             <div class="info-details">
                                 <span class="info-label">Ceremonia Religiosa</span>
                                 <span class="info-value">Parroquia de San Francisco de Asís</span>
-                                <span class="info-address">S. Juan de Aragón 53, CDMX</span>
+                                <span class="info-address">S. Juan de Aragón 53, Nezahualcóyotl.</span>
                                 <button class="map-btn" data-map="church">
                                     <i class="fas fa-location-dot"></i> Cómo llegar
                                 </button>
@@ -227,22 +252,10 @@
                     </div>
                 </div>
                 
-                <div class="action-buttons" data-aos="zoom-in" data-aos-delay="600">
-                    <button class="btn btn-primary" id="reminderBtn">
-                        <i class="fas fa-bell"></i>
-                        <span>Agregar recordatorio</span>
-                    </button>
-                </div>
-                
-                <div id="reminderMessage" class="confirm-message">
-                    <i class="fas fa-check-circle"></i>
-                    <span>¡Recordatorio agregado a tu calendario!</span>
-                </div>
-                
                 <div class="footer" data-aos="fade-up" data-aos-delay="800">
                     <div class="footer-divider"></div>
-                    <p class="footer-text">Tu presencia es el mejor regalo</p>
-                    <p class="footer-family">Ximena y familia</p>
+                    <p class="footer-text">Tu presencia es el mejor regalo.</p>
+                    <p class="footer-family">Ximena y familia.</p>
                 </div>
                 
             </div>

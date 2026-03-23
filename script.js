@@ -6,7 +6,7 @@ const CONFIG = {
     eventTitle: "Primera Comunión - Ximena Morán Vaquero",
     eventDate: "20260425T140000",
     eventEnd: "20260425T180000",
-    eventLocation: "Parroquia de San Francisco de Asís, S. Juan de Aragón 53, CDMX",
+    eventLocation: "Parroquia de San Francisco de Asís, S. Juan de Aragón 53, Nezahulacóyotl",
     eventDetails: "Ceremonia religiosa a las 14:00 hrs. Recepción en Rio Blanco 101, Col. José Vicente Villada, Nezahualcóyotl, Edo. Méx.",
     
     maps: {
@@ -78,7 +78,7 @@ function sendWhatsAppNotification(name, count, message) {
     whatsappMsg += `👤 *Invitado:* ${name}%0A`;
     whatsappMsg += `👥 *Asistentes:* ${peopleText}%0A`;
     whatsappMsg += `📅 *Evento:* Primera Comunión de Ximena%0A`;
-    whatsappMsg += `📍 *Fecha:* Sábado 25 de abril a las 14:00 hrs%0A`;
+    whatsappMsg += `📍 *Fecha:* Sábado 25 de abril a las 13:00 hrs%0A`;
     
     if (message) {
         whatsappMsg += `💬 *Mensaje:* "${message}"%0A`;
@@ -103,10 +103,47 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadConfirmations();
     
-    // ===== FORMULARIO DE CONFIRMACIÓN =====
+    // ===== MODAL DEL FORMULARIO =====
+    const modal = document.getElementById('rsvpModal');
+    const openModalBtn = document.getElementById('openRsvpModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
     const rsvpForm = document.getElementById('rsvpForm');
-    const rsvpStatus = document.getElementById('rsvpMessage');
+    const modalMessage = document.getElementById('rsvpModalMessage');
     
+    // Abrir modal
+    if (openModalBtn) {
+        openModalBtn.addEventListener('click', function() {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+    
+    // Cerrar modal
+    function closeModal() {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        // Limpiar formulario y mensajes
+        if (rsvpForm) rsvpForm.reset();
+        if (modalMessage) {
+            modalMessage.className = 'rsvp-status-modal';
+            modalMessage.textContent = '';
+        }
+    }
+    
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
+    
+    // Cerrar al hacer clic fuera del modal
+    window.addEventListener('click', function(e) {
+        if (modal && modal.classList.contains('show')) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        }
+    });
+    
+    // ===== FORMULARIO DE CONFIRMACIÓN =====
     if (rsvpForm) {
         rsvpForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -116,24 +153,28 @@ document.addEventListener('DOMContentLoaded', function() {
             const message = document.getElementById('guestMessage').value;
             
             if (!name) {
-                rsvpStatus.textContent = 'Por favor, ingresa tu nombre o el de tu familia';
-                rsvpStatus.className = 'rsvp-status error';
+                modalMessage.textContent = 'Por favor, ingresa tu nombre o el de tu familia';
+                modalMessage.className = 'rsvp-status-modal error';
                 return;
             }
             
+            // Guardar confirmación
             addConfirmation(name, count, message);
             
-            rsvpStatus.textContent = '✅ ¡Confirmación enviada! Gracias por acompañarnos.';
-            rsvpStatus.className = 'rsvp-status success';
+            // Mostrar mensaje de éxito
+            modalMessage.textContent = '✅ ¡Confirmación enviada! Gracias por acompañarnos.';
+            modalMessage.className = 'rsvp-status-modal success';
             
+            // Enviar WhatsApp al administrador
             sendWhatsAppNotification(name, count, message);
             
+            // Limpiar formulario
             rsvpForm.reset();
             
+            // Cerrar modal después de 2 segundos
             setTimeout(() => {
-                rsvpStatus.className = 'rsvp-status';
-                rsvpStatus.textContent = '';
-            }, 5000);
+                closeModal();
+            }, 2000);
         });
     }
     
