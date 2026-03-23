@@ -1,13 +1,13 @@
 // ===== CONFIGURACIÓN =====
 const CONFIG = {
     // 🔴 ¡IMPORTANTE! CAMBIA ESTE NÚMERO POR TU WHATSAPP REAL
-    adminWhatsapp: "5652364122", // Ejemplo México: 521 + 10 dígitos
+    adminWhatsapp: "5215551234567", // Ejemplo México: 521 + 10 dígitos
     
     eventTitle: "Primera Comunión - Ximena Morán Vaquero",
-    eventDate: "20260425T140000",
+    eventDate: "20260425T130000",
     eventEnd: "20260425T180000",
-    eventLocation: "Parroquia de San Francisco de Asís, S. Juan de Aragón 53, Nezahulacóyotl",
-    eventDetails: "Ceremonia religiosa a las 14:00 hrs. Recepción en Rio Blanco 101, Col. José Vicente Villada, Nezahualcóyotl, Edo. Méx.",
+    eventLocation: "Parroquia de San Francisco de Asís, S. Juan de Aragón 53, Nezahualcóyotl",
+    eventDetails: "Ceremonia religiosa a las 13:00 hrs. Recepción en Rio Blanco 101, Col. José Vicente Villada, Nezahualcóyotl, Edo. Méx.",
     
     maps: {
         church: "https://maps.app.goo.gl/9v51MvW3mRwUNvQe8",
@@ -23,39 +23,10 @@ function loadConfirmations() {
     if (saved) {
         confirmations = JSON.parse(saved);
     }
-    updateAdminPanel();
 }
 
 function saveConfirmations() {
     localStorage.setItem('comunion_confirmations', JSON.stringify(confirmations));
-    updateAdminPanel();
-}
-
-function updateAdminPanel() {
-    const totalSpan = document.getElementById('totalGuests');
-    const listContainer = document.getElementById('confirmationsList');
-    
-    if (totalSpan) {
-        const total = confirmations.reduce((sum, c) => sum + c.count, 0);
-        totalSpan.textContent = total;
-    }
-    
-    if (listContainer) {
-        if (confirmations.length === 0) {
-            listContainer.innerHTML = '<p style="text-align:center; color:#b8a48c;">Aún no hay confirmaciones</p>';
-        } else {
-            listContainer.innerHTML = confirmations.map((c) => `
-                <div class="confirmation-item">
-                    <div class="confirmation-name">
-                        <span>👥 ${c.name}</span>
-                        <span class="confirmation-count">${c.count} ${c.count === 1 ? 'persona' : 'personas'}</span>
-                    </div>
-                    ${c.message ? `<div class="confirmation-message">💬 "${c.message}"</div>` : ''}
-                    <div class="confirmation-date">📅 ${c.date}</div>
-                </div>
-            `).join('');
-        }
-    }
 }
 
 function addConfirmation(name, count, message) {
@@ -103,14 +74,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     loadConfirmations();
     
-    // ===== MODAL DEL FORMULARIO =====
+    // ===== MODAL =====
     const modal = document.getElementById('rsvpModal');
     const openModalBtn = document.getElementById('openRsvpModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const rsvpForm = document.getElementById('rsvpForm');
     const modalMessage = document.getElementById('rsvpModalMessage');
     
-    // Abrir modal
     if (openModalBtn) {
         openModalBtn.addEventListener('click', function() {
             modal.classList.add('show');
@@ -118,11 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Cerrar modal
     function closeModal() {
         modal.classList.remove('show');
         document.body.style.overflow = '';
-        // Limpiar formulario y mensajes
         if (rsvpForm) rsvpForm.reset();
         if (modalMessage) {
             modalMessage.className = 'rsvp-status-modal';
@@ -134,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
         closeModalBtn.addEventListener('click', closeModal);
     }
     
-    // Cerrar al hacer clic fuera del modal
     window.addEventListener('click', function(e) {
         if (modal && modal.classList.contains('show')) {
             if (e.target === modal) {
@@ -143,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // ===== FORMULARIO DE CONFIRMACIÓN =====
+    // ===== FORMULARIO =====
     if (rsvpForm) {
         rsvpForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -158,67 +125,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Guardar confirmación
             addConfirmation(name, count, message);
             
-            // Mostrar mensaje de éxito
             modalMessage.textContent = '✅ ¡Confirmación enviada! Gracias por acompañarnos.';
             modalMessage.className = 'rsvp-status-modal success';
             
-            // Enviar WhatsApp al administrador
             sendWhatsAppNotification(name, count, message);
             
-            // Limpiar formulario
             rsvpForm.reset();
             
-            // Cerrar modal después de 2 segundos
             setTimeout(() => {
                 closeModal();
             }, 2000);
         });
     }
     
-    // ===== PANEL DE ADMINISTRACIÓN =====
-    const adminBtn = document.getElementById('adminBtn');
-    const adminPanel = document.getElementById('adminPanel');
-    const closeAdminBtn = document.getElementById('closeAdminBtn');
-    const clearConfirmationsBtn = document.getElementById('clearConfirmations');
-    
-    if (adminBtn) {
-        adminBtn.addEventListener('click', function() {
-            updateAdminPanel();
-            adminPanel.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        });
-    }
-    
-    if (closeAdminBtn) {
-        closeAdminBtn.addEventListener('click', function() {
-            adminPanel.style.display = 'none';
-            document.body.style.overflow = '';
-        });
-    }
-    
-    if (clearConfirmationsBtn) {
-        clearConfirmationsBtn.addEventListener('click', function() {
-            if (confirm('¿Estás seguro de que quieres eliminar TODAS las confirmaciones? Esta acción no se puede deshacer.')) {
-                confirmations = [];
-                saveConfirmations();
-                updateAdminPanel();
-            }
-        });
-    }
-    
-    window.addEventListener('click', function(e) {
-        if (adminPanel && adminPanel.style.display === 'block') {
-            if (!adminPanel.contains(e.target) && e.target !== adminBtn) {
-                adminPanel.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-        }
-    });
-    
-    // ===== BOTÓN RECORDATORIO =====
+    // ===== RECORDATORIO =====
     const reminderBtn = document.getElementById('reminderBtn');
     const reminderMessage = document.getElementById('reminderMessage');
     
@@ -277,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ===== BOTONES DE MAPAS =====
+    // ===== MAPAS =====
     const mapButtons = document.querySelectorAll('.map-btn');
     mapButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -291,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // ===== EFECTO PARALLAX =====
+    // ===== PARALLAX =====
     const bgImage = document.querySelector('.bg-image');
     if (bgImage) {
         document.addEventListener('mousemove', function(e) {
