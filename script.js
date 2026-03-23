@@ -1,5 +1,8 @@
-// ===== CONFIGURACIÓN DEL EVENTO =====
+// ===== CONFIGURACIÓN =====
 const CONFIG = {
+    // 🔴 ¡IMPORTANTE! CAMBIA ESTE NÚMERO POR TU WHATSAPP REAL
+    adminWhatsapp: "5652364122", // Ejemplo México: 521 + 10 dígitos
+    
     eventTitle: "Primera Comunión - Ximena Morán Vaquero",
     eventDate: "20260425T140000",
     eventEnd: "20260425T180000",
@@ -12,10 +15,84 @@ const CONFIG = {
     }
 };
 
+// ===== GESTIÓN DE CONFIRMACIONES =====
+let confirmations = [];
+
+function loadConfirmations() {
+    const saved = localStorage.getItem('comunion_confirmations');
+    if (saved) {
+        confirmations = JSON.parse(saved);
+    }
+    updateAdminPanel();
+}
+
+function saveConfirmations() {
+    localStorage.setItem('comunion_confirmations', JSON.stringify(confirmations));
+    updateAdminPanel();
+}
+
+function updateAdminPanel() {
+    const totalSpan = document.getElementById('totalGuests');
+    const listContainer = document.getElementById('confirmationsList');
+    
+    if (totalSpan) {
+        const total = confirmations.reduce((sum, c) => sum + c.count, 0);
+        totalSpan.textContent = total;
+    }
+    
+    if (listContainer) {
+        if (confirmations.length === 0) {
+            listContainer.innerHTML = '<p style="text-align:center; color:#b8a48c;">Aún no hay confirmaciones</p>';
+        } else {
+            listContainer.innerHTML = confirmations.map((c) => `
+                <div class="confirmation-item">
+                    <div class="confirmation-name">
+                        <span>👥 ${c.name}</span>
+                        <span class="confirmation-count">${c.count} ${c.count === 1 ? 'persona' : 'personas'}</span>
+                    </div>
+                    ${c.message ? `<div class="confirmation-message">💬 "${c.message}"</div>` : ''}
+                    <div class="confirmation-date">📅 ${c.date}</div>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+function addConfirmation(name, count, message) {
+    const newConfirm = {
+        id: Date.now(),
+        name: name.trim(),
+        count: parseInt(count),
+        message: message.trim(),
+        date: new Date().toLocaleString('es-MX')
+    };
+    confirmations.unshift(newConfirm);
+    saveConfirmations();
+    return newConfirm;
+}
+
+function sendWhatsAppNotification(name, count, message) {
+    const peopleText = count === 1 ? "1 persona" : `${count} personas`;
+    
+    let whatsappMsg = `🎉 *NUEVA CONFIRMACIÓN* 🎉%0A%0A`;
+    whatsappMsg += `👤 *Invitado:* ${name}%0A`;
+    whatsappMsg += `👥 *Asistentes:* ${peopleText}%0A`;
+    whatsappMsg += `📅 *Evento:* Primera Comunión de Ximena%0A`;
+    whatsappMsg += `📍 *Fecha:* Sábado 25 de abril a las 14:00 hrs%0A`;
+    
+    if (message) {
+        whatsappMsg += `💬 *Mensaje:* "${message}"%0A`;
+    }
+    
+    whatsappMsg += `%0A✨ *¡Gracias por confirmar!* ✨`;
+    
+    const url = `https://wa.me/${CONFIG.adminWhatsapp}?text=${whatsappMsg}`;
+    window.open(url, '_blank');
+}
+
 // ===== INICIALIZACIÓN =====
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Inicializar AOS con animaciones más fluidas
     AOS.init({
         duration: 1000,
         once: false,
@@ -24,20 +101,97 @@ document.addEventListener('DOMContentLoaded', function() {
         mirror: true
     });
     
-    const reminderBtn = document.getElementById('reminderBtn');
-    const confirmMessage = document.getElementById('confirmMessage');
-    const mapButtons = document.querySelectorAll('.map-btn');
+    loadConfirmations();
     
-    function showConfirmation(text = "¡Recordatorio agregado a tu calendario!") {
-        const msgSpan = confirmMessage.querySelector('span');
-        if (msgSpan) msgSpan.textContent = text;
-        confirmMessage.classList.add('show');
-        setTimeout(() => {
-            confirmMessage.classList.remove('show');
-        }, 5000);
+    // ===== FORMULARIO DE CONFIRMACIÓN =====
+    const rsvpForm = document.getElementById('rsvpForm');
+    const rsvpStatus = document.getElementById('rsvpMessage');
+    
+    if (rsvpForm) {
+        rsvpForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('guestName').value;
+            const count = document.getElementById('guestCount').value;
+            const message = document.getElementById('guestMessage').value;
+            
+            if (!name) {
+                rsvpStatus.textContent = 'Por favor, ingresa tu nombre o el de tu familia';
+                rsvpStatus.className = 'rsvp-status error';
+                return;
+            }
+            
+            addConfirmation(name, count, message);
+            
+            rsvpStatus.textContent = '✅ ¡Confirmación enviada! Gracias por acompañarnos.';
+            rsvpStatus.className = 'rsvp-status success';
+            
+            sendWhatsAppNotification(name, count, message);
+            
+            rsvpForm.reset();
+            
+            setTimeout(() => {
+                rsvpStatus.className = 'rsvp-status';
+                rsvpStatus.textContent = '';
+            }, 5000);
+        });
     }
     
-    // Botón recordatorio
+    // ===== PANEL DE ADMINISTRACIÓN =====
+    const adminBtn = document.getElementById('adminBtn');
+    const adminPanel = document.getElementById('adminPanel');
+    const closeAdminBtn = document.getElementById('closeAdminBtn');
+    const clearConfirmationsBtn = document.getElementById('clearConfirmations');
+    
+    if (adminBtn) {
+        adminBtn.addEventListener('click', function() {
+            updateAdminPanel();
+            adminPanel.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+    }
+    
+    if (closeAdminBtn) {
+        closeAdminBtn.addEventListener('click', function() {
+            adminPanel.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+    
+    if (clearConfirmationsBtn) {
+        clearConfirmationsBtn.addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que quieres eliminar TODAS las confirmaciones? Esta acción no se puede deshacer.')) {
+                confirmations = [];
+                saveConfirmations();
+                updateAdminPanel();
+            }
+        });
+    }
+    
+    window.addEventListener('click', function(e) {
+        if (adminPanel && adminPanel.style.display === 'block') {
+            if (!adminPanel.contains(e.target) && e.target !== adminBtn) {
+                adminPanel.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+    });
+    
+    // ===== BOTÓN RECORDATORIO =====
+    const reminderBtn = document.getElementById('reminderBtn');
+    const reminderMessage = document.getElementById('reminderMessage');
+    
+    function showReminderMessage(text) {
+        if (reminderMessage) {
+            const msgSpan = reminderMessage.querySelector('span');
+            if (msgSpan) msgSpan.textContent = text;
+            reminderMessage.classList.add('show');
+            setTimeout(() => {
+                reminderMessage.classList.remove('show');
+            }, 5000);
+        }
+    }
+    
     if (reminderBtn) {
         reminderBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -67,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const encodedData = encodeURIComponent(icsContent);
                 window.location.href = `data:text/calendar;charset=utf8,${encodedData}`;
                 setTimeout(() => {
-                    showConfirmation("¡Evento agregado a tu calendario!");
+                    showReminderMessage("¡Evento agregado a tu calendario!");
                 }, 500);
             } else {
                 const link = document.createElement('a');
@@ -77,12 +231,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
-                showConfirmation("¡Archivo descargado! Ábrelo para agregar a tu calendario.");
+                showReminderMessage("¡Archivo descargado! Ábrelo para agregar a tu calendario.");
             }
         });
     }
     
-    // Botones de mapas
+    // ===== BOTONES DE MAPAS =====
+    const mapButtons = document.querySelectorAll('.map-btn');
     mapButtons.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -90,24 +245,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = CONFIG.maps[mapType];
             if (url) {
                 window.open(url, '_blank');
-                showConfirmation("Abriendo Google Maps");
+                showReminderMessage("Abriendo Google Maps");
             }
         });
     });
     
-    // Animación entrada
-    const card = document.querySelector('.invitation-card');
-    if (card) {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        setTimeout(() => {
-            card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 100);
-    }
-    
-    // Parallax
+    // ===== EFECTO PARALLAX =====
     const bgImage = document.querySelector('.bg-image');
     if (bgImage) {
         document.addEventListener('mousemove', function(e) {
@@ -119,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Partículas dinámicas
+    // ===== PARTÍCULAS =====
     function adjustParticles() {
         const particles = document.querySelectorAll('.particle');
         particles.forEach(particle => {
@@ -136,25 +279,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     adjustParticles();
     
-    // Scroll reveal adicional
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-    
-    document.querySelectorAll('.section-title, .godparents-section, .family-section, .event-info, .action-buttons').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
-    });
+    // Animación entrada
+    const card = document.querySelector('.invitation-card');
+    if (card) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    }
 });
